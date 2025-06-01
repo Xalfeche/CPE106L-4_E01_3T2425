@@ -1,0 +1,5 @@
+Line one: Welcome to file reader!
+Line two: This is the second line!
+Line three: Python is fun!
+Line four: keep learning new things!
+Line Five: Goodbye!
