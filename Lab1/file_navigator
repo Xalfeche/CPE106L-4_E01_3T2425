@@ -1,0 +1,39 @@
+def main():
+    filename = input("Enter the filename: ")
+    
+    try:
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+        
+        lines = [line.rstrip('\n') for line in lines]
+        
+        print(f"File '{filename}' loaded successfully!")
+        
+        while True:
+            print(f"\nNumber of lines in file: {len(lines)}")
+            
+            try:
+                line_number = int(input("Enter line number (1-{}, or 0 to quit): ".format(len(lines))))
+                
+                if line_number == 0:
+                    print("Goodbye!")
+                    break
+                
+                # Check if line number is valid
+                if 1 <= line_number <= len(lines):
+                    print(f"Line {line_number}: {lines[line_number - 1]}")
+                else:
+                    print(f"Invalid line number. Please enter a number between 1 and {len(lines)}, or 0 to quit.")
+            
+            except ValueError:
+                print("Please enter a valid integer.")
+    
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+    except IOError:
+        print(f"Error: Could not read file '{filename}'.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+if __name__ == "__main__":
+    main()
