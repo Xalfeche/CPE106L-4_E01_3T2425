@@ -22,8 +22,28 @@ class SavingsAccount:
         return result
 
     def __lt__(self, other):
-        """Less than comparison based on account name for sorting."""
+        """Less than comparison based on account name."""
         return self.name < other.name
+    
+    def __le__(self, other):
+        """Less than or equal comparison based on account name."""
+        return self.name <= other.name
+    
+    def __gt__(self, other):
+        """Greater than comparison based on account name."""
+        return self.name > other.name
+    
+    def __ge__(self, other):
+        """Greater than or equal comparison based on account name."""
+        return self.name >= other.name
+    
+    def __eq__(self, other):
+        """Equality comparison based on account name."""
+        return self.name == other.name
+    
+    def __ne__(self, other):
+        """Not equal comparison based on account name."""
+        return self.name != other.name
 
     def getBalance(self):
         """Returns the current balance."""
@@ -45,7 +65,7 @@ class SavingsAccount:
         return None
 
     def withdraw(self, amount):
-        """If the amount is valid, subtract it
+        """If the amount is valid, sunstract it
         from the balance and returns None;
         otherwise, returns an error message."""
         if amount < 0:

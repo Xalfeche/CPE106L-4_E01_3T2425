@@ -3,14 +3,18 @@ File: bank.py
 This module defines the Bank class.
 """
 import pickle
-
+import random
 from savingsaccount import SavingsAccount
 
 class Bank:
-    """This class represents a bank as a collection of savings accounts.
+    """This class represents a bank as a collection of savnings accounts.
     An optional file name is also associated
     with the bank, to allow transfer of accounts to and
     from permanent file storage."""
+
+    # The state of the bank is a dictionary of accounts and
+    # a file name.  If the file name is None, a file name
+    # for the bank has not yet been established.
 
     def __init__(self, fileName = None):
         """Creates a new dictionary to hold the accounts.
@@ -30,7 +34,7 @@ class Bank:
 
     def __str__(self):
         """Returns the string representation of the bank with accounts sorted by name."""
-        # Sort accounts by name using the __lt__ method in SavingsAccount
+        # Sort the accounts by name using the comparison methods
         sorted_accounts = sorted(self.accounts.values())
         return "\n".join(map(str, sorted_accounts))
 
@@ -67,6 +71,7 @@ class Bank:
 
     def getKeys(self):
         """Returns a sorted list of keys."""
+        # Exercise
         return []
 
     def save(self, fileName = None):
@@ -81,24 +86,46 @@ class Bank:
             pickle.dump(account, fileObj)
         fileObj.close()
 
-
-# ===== TEST DEMONSTRATION =====
-def test_sorted_accounts():
-    """Test function to demonstrate accounts are sorted by name."""
-    print("=== Testing Account Sorting by Name ===\n")
-    
-    # Create a bank
+# Functions for testing
+       
+def createBank(numAccounts = 1):
+    """Returns a new bank with the given number of 
+    accounts."""
+    names = ("Brandon", "Molly", "Elena", "Mark", "Tricia",
+             "Ken", "Jill", "Jack")
     bank = Bank()
-    
-    # Add accounts in non-alphabetical order
-    bank.add(SavingsAccount("Zoe", "1001", 500.0))
-    bank.add(SavingsAccount("Alice", "1002", 750.0))
-    bank.add(SavingsAccount("Mark", "1003", 300.0))
-    bank.add(SavingsAccount("Bob", "1004", 900.0))
-    
-    print("\nBank accounts (should be sorted alphabetically by name):")
+    upperPin = numAccounts + 1000
+    for pinNumber in range(1000, upperPin):
+        name = random.choice(names)
+        balance = float(random.randint(100, 1000))
+        bank.add(SavingsAccount(name, str(pinNumber), balance))
+    return bank
+
+def testAccount():
+    """Test function for savings account."""
+    account = SavingsAccount("Ken", "1000", 500.00)
+    print(account)
+    print(account.deposit(100))
+    print("Expect 600:", account.getBalance())
+    print(account.deposit(-50))
+    print("Expect 600:", account.getBalance())
+    print(account.withdraw(100))
+    print("Expect 500:", account.getBalance())
+    print(account.withdraw(-50))
+    print("Expect 500:", account.getBalance())
+    print(account.withdraw(100000))
+    print("Expect 500:", account.getBalance())
+
+def main(number = 10, fileName = None):
+    """Creates and prints a bank, either from
+    the optional file name argument or from the optional
+    number."""
+    testAccount()
+    if fileName:
+        bank = Bank(fileName)
+    else:
+        bank = createBank(number)
     print(bank)
-    
-    print("\n" + "="*50)
+
 if __name__ == "__main__":
-    test_sorted_accounts()
+    main()
