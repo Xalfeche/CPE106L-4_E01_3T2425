@@ -3,9 +3,8 @@ File: bank.py
 This module defines the Bank class.
 """
 import pickle
-import random
 
-from Lab3.PE3 import savingsaccount
+from savingsaccount import SavingsAccount
 
 class Bank:
     """This class represents a bank as a collection of savings accounts.
@@ -92,19 +91,14 @@ def test_sorted_accounts():
     bank = Bank()
     
     # Add accounts in non-alphabetical order
-    print("Adding accounts in this order: Zoe, Alice, Mark, Bob")
-    bank.add(savingsaccount("Zoe", "1001", 500.0))
-    bank.add(savingsaccount("Alice", "1002", 750.0))
-    bank.add(savingsaccount("Mark", "1003", 300.0))
-    bank.add(savingsaccount("Bob", "1004", 900.0))
+    bank.add(SavingsAccount("Zoe", "1001", 500.0))
+    bank.add(SavingsAccount("Alice", "1002", 750.0))
+    bank.add(SavingsAccount("Mark", "1003", 300.0))
+    bank.add(SavingsAccount("Bob", "1004", 900.0))
     
     print("\nBank accounts (should be sorted alphabetically by name):")
     print(bank)
     
     print("\n" + "="*50)
-    print("Notice how the accounts appear in alphabetical order:")
-    print("Alice, Bob, Mark, Zoe")
-    print("Even though they were added as: Zoe, Alice, Mark, Bob")
-
 if __name__ == "__main__":
     test_sorted_accounts()
