@@ -21,6 +21,10 @@ class SavingsAccount:
         result += 'Balance: ' + str(self.balance)
         return result
 
+    def __lt__(self, other):
+        """Less than comparison based on account name for sorting."""
+        return self.name < other.name
+
     def getBalance(self):
         """Returns the current balance."""
         return self.balance
@@ -41,7 +45,7 @@ class SavingsAccount:
         return None
 
     def withdraw(self, amount):
-        """If the amount is valid, sunstract it
+        """If the amount is valid, subtract it
         from the balance and returns None;
         otherwise, returns an error message."""
         if amount < 0:
