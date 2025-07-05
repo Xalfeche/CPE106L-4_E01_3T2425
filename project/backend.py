@@ -1,46 +1,72 @@
-# 1. Backend: User auth API & MongoDB setup.
-# This section handles user authentication and MongoDB interactions.
-# This code directly implements logic for a self-contained application.
-class CommunityConnectBackend:
-    """
-    Manages all data and core logic for CommunityConnect.
-    This class connects to MongoDB for data persistence.
-    """
-    def __init__(self):
-        try:
-            # Establish MongoDB connection
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from motor.motor_asyncio import AsyncIOMotorClient
+from datetime import datetime
+import googlemaps
 
-            self.client = MongoClient("mongodb://localhost:*insert port*/")
-            self.db = self.client.communityconnect_db # Your database name
+# --- CONFIG ---
+MONGO_URI = "mongodb://localhost:27017"
+DB_NAME = "communityconnect"
+GOOGLE_MAPS_API_KEY = "AIzaSyAQGNBrrl9hB9exTYzmhxGgYWBB3np458A"
+# --------------
 
-            # Define collections
-            self.users_collection = self.db.users
-            self.drivers_collection = self.db.drivers
-            self.vehicles_collection = self.db.vehicles
-            self.locations_collection = self.db.locations
-            self.ride_requests_collection = self.db.ride_requests
-            self.accessibility_needs_collection = self.db.accessibility_needs
-            self.driver_availabilities_collection = self.db.driver_availabilities
+# init
+app = FastAPI(title="CommunityConnect API")
+gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+client = AsyncIOMotorClient(MONGO_URI)
+db = client[DB_NAME]
+rides_col = db["ride_requests"]
 
-            # Ensures unique index
-            self.users_collection.create_index("user_id", unique=True)
-            self.users_collection.create_index("email", unique=True)
-            self.drivers_collection.create_index("driver_id", unique=True)
-            self.vehicles_collection.create_index("vehicle_id", unique=True)
-            self.locations_collection.create_index("location_id", unique=True)
-            self.ride_requests_collection.create_index("request_id", unique=True)
-            self.accessibility_needs_collection.create_index("accessibility_id", unique=True)
-            self.driver_availabilities_collection.create_index("availability_id", unique=True)
+# Pydantic model
+class RideRequest(BaseModel):
+    rider_name: str
+    pickup_location: str
+    dropoff_location: str
+    requested_time: str
 
-            print("Successfully connected to MongoDB.")
+# create a ride request
+@app.post("/rides/request")
+async def request_ride(r: RideRequest):
+    # calculate real distance & duration
+    matrix = gmaps.distance_matrix(r.pickup_location, r.dropoff_location, mode="driving")
+    elem = matrix["rows"][0]["elements"][0]
+    dist = elem["distance"]["value"]
+    dur  = elem["duration"]["value"]
 
-        except pymongo_errors.ConnectionFailure as e:
-            QMessageBox.critical(None, "Database Connection Error",
-                                 f"Could not connect to MongoDB: {e}\n"
-                                 "Please ensure MongoDB is installed and running on localhost:27017.")
-            # Exit application
-            sys.exit(1) # Exit if cannot connect to DB at startup
-        except Exception as e:
-            QMessageBox.critical(None, "Initialization Error",
-                                 f"An unexpected error occurred during backend initialization: {e}")
-            sys.exit(1)
+    doc = r.dict()
+    doc.update({
+        "distance_m": dist,
+        "duration_s": dur,
+        "status": "pending",
+        "created_at": datetime.utcnow()
+    })
+    res = await rides_col.insert_one(doc)
+    return {"request_id": str(res.inserted_id), "distance_m": dist, "duration_s": dur}
+
+# list pending
+@app.get("/rides/pending")
+async def list_pending():
+    return await rides_col.find({"status": "pending"}).to_list(100)
+
+# accept a ride
+@app.post("/rides/accept/{rid}")
+async def accept_ride(rid: str):
+    upd = await rides_col.update_one({"_id": rid, "status": "pending"}, {"$set": {"status": "accepted"}})
+    if upd.modified_count == 0:
+        raise HTTPException(404, "Ride not found or already accepted")
+    return {"message": "accepted"}
+
+# analytics: rides per weekday
+@app.get("/analytics/ride_counts")
+async def ride_counts():
+    pipeline = [
+        {"$group": {
+            "_id": {"$dayOfWeek": "$created_at"},
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    raw = await rides_col.aggregate(pipeline).to_list(length=7)
+    # transform for frontend
+    return [{"day": doc["_id"]["$dayOfWeek"] if isinstance(doc["_id"], dict) else doc["_id"],
+             "count": doc["count"]} for doc in raw]
