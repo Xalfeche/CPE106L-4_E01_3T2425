@@ -6,8 +6,8 @@ import googlemaps
 
 # --- CONFIG ---
 MONGO_URI = "mongodb://localhost:27017"
-DB_NAME = "communityconnect"
-GOOGLE_MAPS_API_KEY = "AIzaSyAQGNBrrl9hB9exTYzmhxGgYWBB3np458A"
+DB_NAME = "project"
+GOOGLE_MAPS_API_KEY = "API_KEY_HERE"
 # --------------
 
 # init
