@@ -1,5 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+
+# Print the current working directory
+print("Current working directory:", os.getcwd())
 
 # Load the data from the CSV file
 data = pd.read_csv('breadprice.csv')
@@ -31,11 +35,11 @@ plt.xlabel('Year')
 plt.ylabel('Average Price ($)')
 plt.grid(True)
 
-# Show the plot
-plt.show()
-
 # Save the plot to a file
 plt.savefig('bread_price_plot.png')
+
+# Show the plot
+plt.show()
 
 # Print confirmation message
 print("\nPlot saved as 'bread_price_plot.png'")
