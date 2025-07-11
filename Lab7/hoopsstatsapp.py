@@ -11,15 +11,7 @@ import os
 def cleanStats(df):
     """
     Clean basketball statistics data by splitting columns with 'makes-attempts' format.
-    
-    This function processes columns FG, 3PT, and FT that contain data in the format 
-    '<makes>-<attempts>' and splits them into separate columns for makes and attempts.
-    
-    Parameters:
-    df (pandas.DataFrame): The original basketball statistics dataframe
-    
-    Returns:
-    pandas.DataFrame: Cleaned dataframe with split columns
+
     """
     
     # Create a copy of the dataframe to avoid modifying the original

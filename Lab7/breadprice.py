@@ -32,7 +32,7 @@ plt.plot(data['Year'], data['Average Price'], marker='o', linestyle='-', color='
 # Add title and labels
 plt.title('Average Price of Bread per Year')
 plt.xlabel('Year')
-plt.ylabel('Average Price ($)')
+plt.ylabel('Average Price')
 plt.grid(True)
 
 # Save the plot to a file

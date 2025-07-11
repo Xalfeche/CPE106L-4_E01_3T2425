@@ -5,7 +5,7 @@ The view for view and analyzing basketball player statistics.
 
 from breezypythongui import EasyFrame
 import pandas as pd
-import os
+
 
 class HoopStatsView(EasyFrame):
 
@@ -63,4 +63,4 @@ class HoopStatsView(EasyFrame):
         self.medianFld.setNumber(column.median())
         self.stdFld.setNumber(column.std())
 
-    
+
