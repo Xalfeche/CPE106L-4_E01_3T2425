@@ -9,6 +9,9 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 20
     page.bgcolor = ft.Colors.GREY_100
+    page.window_width = 1200
+    page.window_height = 800
+    page.window_maximized = True
     
     tabs = ft.Tabs(
         selected_index=0,
@@ -20,7 +23,7 @@ def main(page: ft.Page):
         expand=1,
     )
     
-    # Rider UI - Card-based design matching your visual
+    # Rider UI
     name = ft.TextField(
         label="Name",
         width=200,
@@ -75,23 +78,17 @@ def main(page: ft.Page):
             stat_r.color = ft.Colors.RED_400
         page.update()
     
-    # Map placeholder matching your design
+    # Map placeholder 
     map_placeholder = ft.Container(
         content=ft.Column([
             ft.Text(
-                "Insert real",
+                "Placeholer for",
                 size=16,
                 weight=ft.FontWeight.BOLD,
                 color=ft.Colors.BLACK54
             ),
             ft.Text(
-                "google maps",
-                size=16,
-                weight=ft.FontWeight.BOLD,
-                color=ft.Colors.BLACK54
-            ),
-            ft.Text(
-                "here",
+                "Maps",
                 size=16,
                 weight=ft.FontWeight.BOLD,
                 color=ft.Colors.BLACK54
@@ -138,11 +135,15 @@ def main(page: ft.Page):
         width=300
     )
     
-    rider_v = ft.Row([
-        left_controls,
-        ft.Container(width=20),  # Spacer
-        map_placeholder
-    ], alignment=ft.MainAxisAlignment.START)
+    rider_v = ft.Container(
+        content=ft.Row([
+            left_controls,
+            ft.Container(width=20),  # Spacer
+            map_placeholder
+        ], alignment=ft.MainAxisAlignment.CENTER, expand=True),
+        alignment=ft.alignment.center,
+        expand=True
+    )
     
     # Driver UI
     driver_table_rows = []
@@ -240,13 +241,17 @@ def main(page: ft.Page):
         width=550
     )
     
-    driver_v = ft.Row([
-        driver_left_controls,
-        ft.Container(width=20),  # Spacer
-        map_placeholder
-    ], alignment=ft.MainAxisAlignment.START)
+    driver_v = ft.Container(
+        content=ft.Row([
+            driver_left_controls,
+            ft.Container(width=20),  # Spacer
+            map_placeholder
+        ], alignment=ft.MainAxisAlignment.CENTER, expand=True),
+        alignment=ft.alignment.center,
+        expand=True
+    )
     
-    # Admin UI - Updated to match the visual design
+    # Admin UI
     def show_stats(e):
         try:
             data = requests.get(f"{API}/analytics/ride_counts").json()
@@ -262,7 +267,7 @@ def main(page: ft.Page):
         except:
             pass
     
-    # Chart placeholder matching the visual design
+    # Chart placeholder
     chart_placeholder = ft.Container(
         content=ft.Column([
             # Create a simple bar chart visualization
@@ -303,7 +308,7 @@ def main(page: ft.Page):
         alignment=ft.alignment.center
     )
     
-    # Admin left side controls matching the visual design
+    # Admin left side controls
     admin_left_controls = ft.Container(
         content=ft.Column([
             ft.Row([
@@ -338,15 +343,44 @@ def main(page: ft.Page):
         width=350
     )
     
-    admin_v = admin_left_controls
+    admin_v = ft.Container(
+        content=admin_left_controls,
+        alignment=ft.alignment.center,
+        expand=True
+    )
     
     # Tab content switcher
     def tab_changed(e):
-        page.controls.pop()
-        page.add([rider_v, driver_v, admin_v][e.control.selected_index])
+        # Clear all controls
+        page.controls.clear()
+        
+        # Create main content with the selected tab
+        selected_content = [rider_v, driver_v, admin_v][e.control.selected_index]
+        
+        main_content = ft.Column([
+            ft.Container(
+                content=tabs,
+                alignment=ft.alignment.center,
+                width=800
+            ),
+            selected_content
+        ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER, expand=True)
+        
+        page.add(main_content)
         page.update()
     
     tabs.on_change = tab_changed
-    page.add(tabs, rider_v)
+    
+    # Wrap everything in a centered column
+    main_content = ft.Column([
+        ft.Container(
+            content=tabs,
+            alignment=ft.alignment.center,
+            width=800
+        ),
+        rider_v
+    ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER, expand=True)
+    
+    page.add(main_content)
 
 ft.app(target=main)
