@@ -108,9 +108,6 @@ class AdminTab(QWidget):
             headers = {"Authorization": f"Bearer {self.token}"}
             data = requests.get(f"{API}/analytics/ride_counts", headers=headers).json()
             
-            if not data:
-                QMessageBox.information(self, "No Data", "No ride data available for this week.")
-                return
             days = [d["day"] for d in data]
             cnts = [d["count"] for d in data]
             
@@ -131,9 +128,6 @@ class AdminTab(QWidget):
             headers = {"Authorization": f"Bearer {self.token}"}
             data = requests.get(f"{API}/analytics/user_rides", headers=headers).json()
             
-            if not data:
-                QMessageBox.information(self, "No Data", "No user ride data available.")
-                return
             users = [d["rider_name"] for d in data]
             cnts = [d["count"] for d in data]
             
